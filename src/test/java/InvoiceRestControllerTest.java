@@ -243,4 +243,51 @@ class InvoiceRestControllerTest {
         assertEquals("Unable to save invoice", response.getBody());  // Generic error message for duplicate entry
         verify(invoiceService, times(1)).saveInvoice(invoice);
     }
+
+    @Test
+    void testGetOneInvoice_NegativeID() {
+        // Arrange
+        Long id = -1L;
+        when(invoiceService.getOneInvoice(id)).thenReturn(null); // Assuming negative IDs are not valid
+
+        // Act
+        ResponseEntity<?> response = invoiceRestController.getOneInvoice(id);
+
+        // Assert
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode()); // Or BAD_REQUEST if you expect validation
+        assertEquals("Invoice not found", response.getBody()); // Adjust as needed based on expected behavior
+        verify(invoiceService, times(1)).getOneInvoice(id);
+    }
+
+    @Test
+    void testGetOneInvoice_NullID() {
+        // Arrange
+        Long id = null;
+        // This will typically result in a 400 Bad Request response if the ID is null
+        // Ensure the method throws a meaningful exception or handles it gracefully
+        // Act
+        ResponseEntity<?> response = invoiceRestController.getOneInvoice(id);
+
+        // Assert
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode()); // Framework-dependent
+        assertEquals("Invoice not found", response.getBody()); // Custom message if applicable
+        verify(invoiceService, never()).getOneInvoice(any(Long.class));
+    }
+
+    @Test
+    void testGetOneInvoice_Exception() {
+        // Arrange
+        Long id = 1L;
+        when(invoiceService.getOneInvoice(id)).thenThrow(new RuntimeException("Database error"));
+
+        // Act
+        ResponseEntity<?> response = invoiceRestController.getOneInvoice(id);
+
+        // Assert
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+        assertEquals("Unable to find Invoice", response.getBody());
+        verify(invoiceService, times(1)).getOneInvoice(id);
+    }
+
+
 }

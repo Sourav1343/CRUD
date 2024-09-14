@@ -63,15 +63,23 @@ public class InvoiceServiceImpl implements InvoiceService {
     }
 
     @Override
-    public Invoice getOneInvoice(Long id){
-        Invoice inv = repo.findById(id)
-                .orElseThrow(()->new InvoiceNotFoundException(
-                        new StringBuffer().append("Product  '")
-                                .append(id)
-                                .append("' not exist")
-                                .toString())
-                );
-        return inv;
+    public Invoice getOneInvoice(Long id) {
+        logger.info("Fetching invoice with ID: {}", id);
+
+        try {
+            Invoice inv = repo.findById(id)
+                    .orElseThrow(() -> new InvoiceNotFoundException(
+                            "Invoice with ID " + id + " does not exist"));
+
+            logger.info("Successfully retrieved invoice with ID: {}", id);
+            return inv;
+        } catch (InvoiceNotFoundException ex) {
+            logger.warn("Invoice not found with ID: {}: {}", id, ex.getMessage());
+            throw ex; // Rethrow the exception for the controller to handle
+        } catch (Exception ex) {
+            logger.error("Error occurred while fetching invoice with ID: {}: {}", id, ex.getMessage());
+            throw new RuntimeException("Unexpected error occurred while retrieving invoice", ex);
+        }
     }
 
     @Override
