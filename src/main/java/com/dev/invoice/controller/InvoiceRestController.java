@@ -133,7 +133,7 @@ public class InvoiceRestController {
             invoiceUtil.copyNonNullValues(invoice,inv);
             //finally update this Object
             invoiceService.updateInvoice(inv);
-            responseEntity = new ResponseEntity<String>("Invoice'"+id+"' Updated",HttpStatus.RESET_CONTENT);
+            responseEntity = ResponseEntity.ok("Invoice '" + id + "' Updated");
         }
         catch (InvoiceNotFoundException invoiceNotFoundException){
             throw invoiceNotFoundException;
