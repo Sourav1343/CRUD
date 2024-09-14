@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.StringTokenizer;
 
 @RestController
 @RequestMapping("/api")
@@ -116,6 +117,33 @@ public class InvoiceRestController {
             responseEntity = new ResponseEntity<>("Unable to delete invoice", HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
+        return responseEntity;
+    }
+
+    /**
+     * To Modify one invoice by providing id, updates Invoice Object return status as ResponseEntity<String>
+     */
+    @PutMapping("/invoices/{id}")
+    public ResponseEntity<String> updateInvoice(@PathVariable Long id ,@RequestBody Invoice invoice){
+        ResponseEntity responseEntity = null;
+        try {
+            //db object
+            Invoice inv = invoiceService.getOneInvoice(id);
+            //copy non-null values from the request to Database Object
+            invoiceUtil.copyNonNullValues(invoice,inv);
+            //finally update this Object
+            invoiceService.updateInvoice(inv);
+            responseEntity = new ResponseEntity<String>("Invoice'"+id+"' Updated",HttpStatus.RESET_CONTENT);
+        }
+        catch (InvoiceNotFoundException invoiceNotFoundException){
+            throw invoiceNotFoundException;
+        }
+        catch (Exception exception){
+            exception.printStackTrace();
+            responseEntity = new ResponseEntity<String>(
+                    "Unable to Update Invoice",
+                    HttpStatus.INTERNAL_SERVER_ERROR);
+        }
         return responseEntity;
     }
 }
