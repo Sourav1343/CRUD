@@ -18,7 +18,7 @@ import java.util.Optional;
 public class InvoiceServiceImpl implements InvoiceService {
 
    @Autowired
-   private InvoiceRepository repo;
+   private  InvoiceRepository repo;
 
    @Autowired
    private InvoiceUtil util;
@@ -53,8 +53,21 @@ public class InvoiceServiceImpl implements InvoiceService {
 
     @Override
     public void deleteInvoice(Long id) {
-    Invoice inv = getOneInvoice(id);
-    repo.delete(inv);
+        logger.info("Initiating deletion process for invoice with ID: {}", id);
+
+        try {
+            Invoice inv = getOneInvoice(id);
+            logger.info("Successfully retrieved invoice with ID: {} for deletion", id);
+
+            repo.delete(inv);
+            logger.info("Successfully deleted invoice with ID: {}", id);
+        } catch (InvoiceNotFoundException ex) {
+            logger.warn("Invoice with ID {} not found, deletion aborted: {}", id, ex.getMessage());
+            throw ex;  // Rethrow for controller to handle
+        } catch (Exception ex) {
+            logger.error("Error occurred while deleting invoice with ID: {}: {}", id, ex.getMessage());
+            throw new RuntimeException("Unexpected error occurred during invoice deletion", ex);
+        }
     }
 
     @Override

@@ -1,5 +1,8 @@
+package invoice.controller;
+
 import com.dev.invoice.Entity.Invoice;
 import com.dev.invoice.controller.InvoiceRestController;
+import com.dev.invoice.exception.InvoiceNotFoundException;
 import com.dev.invoice.service.InvoiceService;
 import com.dev.invoice.util.InvoiceUtil;
 import org.junit.jupiter.api.BeforeEach;
@@ -288,6 +291,67 @@ class InvoiceRestControllerTest {
         assertEquals("Unable to find Invoice", response.getBody());
         verify(invoiceService, times(1)).getOneInvoice(id);
     }
+
+    @Test
+    void testDeleteInvoice_Success() {
+        // Arrange
+        Long id = 1L;
+        doNothing().when(invoiceService).deleteInvoice(id); // No exception thrown
+
+        // Act
+        ResponseEntity<String> response = invoiceRestController.deleteInvoice(id);
+
+        // Assert
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals("Invoice with ID " + id + " deleted", response.getBody());
+        verify(invoiceService, times(1)).deleteInvoice(id);
+    }
+    @Test
+    void testDeleteInvoice_NotFound() {
+        // Arrange
+        Long id = 1L;
+        doThrow(new InvoiceNotFoundException("Invoice not found")).when(invoiceService).deleteInvoice(id);
+
+        // Act
+        ResponseEntity<String> response = invoiceRestController.deleteInvoice(id);
+
+        // Assert
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        assertEquals("Invoice not found", response.getBody());
+        verify(invoiceService, times(1)).deleteInvoice(id);
+    }
+
+    @Test
+    void testDeleteInvoice_Exception() {
+        // Arrange
+        Long id = 1L;
+        doThrow(new RuntimeException("Database error")).when(invoiceService).deleteInvoice(id);
+
+        // Act
+        ResponseEntity<String> response = invoiceRestController.deleteInvoice(id);
+
+        // Assert
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+        assertEquals("Unable to delete invoice", response.getBody());
+        verify(invoiceService, times(1)).deleteInvoice(id);
+    }
+
+    @Test
+    void testDeleteInvoice_NegativeID() {
+        // Arrange
+        Long id = -1L;
+        doThrow(new InvoiceNotFoundException("Invoice not found")).when(invoiceService).deleteInvoice(id); // Assume negative IDs are invalid
+
+        // Act
+        ResponseEntity<String> response = invoiceRestController.deleteInvoice(id);
+
+        // Assert
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        assertEquals("Invoice not found", response.getBody());
+        verify(invoiceService, times(1)).deleteInvoice(id);
+    }
+
+
 
 
 }

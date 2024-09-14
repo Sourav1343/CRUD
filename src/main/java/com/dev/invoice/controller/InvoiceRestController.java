@@ -94,6 +94,30 @@ public class InvoiceRestController {
         return responseEntity;
 
     }
+
+    /**
+     * To Delete One Invoice by providing id, returns Status as ResponseEntity<String>
+     */
+
+    @DeleteMapping("invoices/{id}")
+    public ResponseEntity<String> deleteInvoice(@PathVariable Long id) {
+        logger.info("Received request to delete invoice with ID: {}", id);
+
+        ResponseEntity<String> responseEntity;
+        try {
+            invoiceService.deleteInvoice(id);
+            logger.info("Successfully deleted invoice with ID: {}", id);
+            responseEntity = new ResponseEntity<>("Invoice with ID " + id + " deleted", HttpStatus.OK);
+        } catch (InvoiceNotFoundException ex) {
+            logger.warn("Invoice with ID {} not found: {}", id, ex.getMessage());
+            responseEntity = new ResponseEntity<>("Invoice not found", HttpStatus.NOT_FOUND);
+        } catch (Exception ex) {
+            logger.error("Error occurred while deleting invoice with ID: {}: {}", id, ex.getMessage());
+            responseEntity = new ResponseEntity<>("Unable to delete invoice", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        return responseEntity;
+    }
 }
 
 
