@@ -69,11 +69,31 @@ public class InvoiceRestController {
         return responseEntity;
     }
 
-
     /**
-     *
+     * To retrieve one Invoice by providing id, returns Invoice object & Status as ResponseEntity<?>
      */
+    @GetMapping("/invoices/{id}")
+    public ResponseEntity<?> getOneInvoice(@PathVariable Long id) {
+        logger.info("Received request to get invoice with ID: {}", id);
 
+        ResponseEntity<?> responseEntity;
+        try {
+            Invoice invoice = invoiceService.getOneInvoice(id);
+            if (invoice != null) {
+                logger.info("Successfully retrieved invoice with ID: {}", id);
+                responseEntity = new ResponseEntity<>(invoice, HttpStatus.OK);
+            } else {
+                logger.warn("No invoice found with ID: {}", id);
+                responseEntity = new ResponseEntity<>("Invoice not found", HttpStatus.NOT_FOUND);
+            }
+        } catch (Exception exception) {
+            logger.error("Error occurred while retrieving invoice with ID: {}: {}", id, exception.getMessage());
+            responseEntity = new ResponseEntity<>("Unable to find Invoice", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        return responseEntity;
+
+    }
 }
 
 
