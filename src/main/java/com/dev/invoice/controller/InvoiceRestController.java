@@ -29,21 +29,25 @@ public class InvoiceRestController {
     private static final Logger logger = LoggerFactory.getLogger(InvoiceRestController.class);
     @PostMapping("/invoices")
     public ResponseEntity<String> saveInvoice(@RequestBody Invoice invoice) {
-        ResponseEntity<String> responseEntity = null;
         logger.info("Received request to save invoice: {}", invoice); // Log the received invoice
+
+        // Check if the invoice is null
+        if (invoice == null) {
+            logger.error("Received null invoice");
+            return new ResponseEntity<>("Invoice cannot be null", HttpStatus.BAD_REQUEST);
+        }
 
         try {
             logger.debug("Attempting to save the invoice...");
             Long id = invoiceService.saveInvoice(invoice); // Save invoice
-            responseEntity = new ResponseEntity<>("Invoice with ID '" + id + "' has been created", HttpStatus.CREATED);
+            logger.info("Invoice saved with ID '{}'", id);
+            return new ResponseEntity<>("Invoice with ID '" + id + "' has been created", HttpStatus.CREATED);
         } catch (Exception exception) {
             logger.error("Error occurred while saving invoice: {}", exception.getMessage()); // Log the error
-            responseEntity = new ResponseEntity<>("Unable to save invoice", HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>("Unable to save invoice", HttpStatus.INTERNAL_SERVER_ERROR);
         }
-
-        logger.debug("Returning response: {}", responseEntity); // Log the final response
-        return responseEntity;
     }
+
 
     /**
      * To retrieve all Invoices, returns data retrieval Status as ResponseEntity<?>

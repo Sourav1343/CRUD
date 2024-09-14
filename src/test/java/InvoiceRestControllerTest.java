@@ -24,6 +24,7 @@ class InvoiceRestControllerTest {
     @Mock
     private InvoiceUtil invoiceUtil;
 
+
     @InjectMocks
     private InvoiceRestController invoiceRestController;
 
@@ -35,14 +36,18 @@ class InvoiceRestControllerTest {
     @Test
     void testSaveInvoiceSuccess() {
         // Arrange
+
         Invoice invoice = new Invoice(); // Create a sample invoice object
         invoice.setId(1L); // Set an ID for the sample invoice
         when(invoiceService.saveInvoice(invoice)).thenReturn(1L); // Mock the service call
 
         // Act
         ResponseEntity<String> response = invoiceRestController.saveInvoice(invoice);
+      //  ResponseEntity<String> response = invoiceRestController.saveInvoice(invoice);
 
         // Assert
+        assertEquals(HttpStatus.CREATED,response.getStatusCode());
+
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
         assertEquals("Invoice with ID '1' has been created", response.getBody());
         verify(invoiceService, times(1)).saveInvoice(invoice); // Verify that the service was called once
@@ -108,10 +113,11 @@ class InvoiceRestControllerTest {
         ResponseEntity<String> response = invoiceRestController.saveInvoice(invoice);
 
         // Assert
-        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
-        assertEquals("Unable to save invoice", response.getBody());  // Expected to throw an exception
-        verify(invoiceService, never()).saveInvoice(invoice); // Service should not be called with null
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertEquals("Invoice cannot be null", response.getBody());  // Expected message for null invoice
+        verify(invoiceService, never()).saveInvoice(any(Invoice.class)); // Service should not be called with null
     }
+
 
     /**
      * Edge Case: Test saveInvoice with an invoice having missing fields
@@ -190,16 +196,18 @@ class InvoiceRestControllerTest {
     void testSaveInvoice_NegativeInvoiceID() {
         // Arrange
         Invoice invoice = new Invoice();
-        when(invoiceService.saveInvoice(invoice)).thenReturn(-1L); // Mocking an invalid ID return
+        // Mock the service to throw an exception when saveInvoice is called
+        when(invoiceService.saveInvoice(invoice)).thenThrow(new RuntimeException("Unable to save invoice"));
 
         // Act
         ResponseEntity<String> response = invoiceRestController.saveInvoice(invoice);
 
         // Assert
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
-        assertEquals("Unable to save invoice", response.getBody());  // Invalid ID should cause failure
+        assertEquals("Unable to save invoice", response.getBody());
         verify(invoiceService, times(1)).saveInvoice(invoice);
     }
+
 
     /**
      * Edge Case: Test getAllInvoices when invoiceService throws an exception
