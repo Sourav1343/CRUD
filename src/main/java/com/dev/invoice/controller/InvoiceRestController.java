@@ -26,7 +26,7 @@ public class InvoiceRestController {
     @Autowired
     private InvoiceUtil invoiceUtil;
 
-   // ResponseEntity<String> responseEntity = null;
+
     private static final Logger logger = LoggerFactory.getLogger(InvoiceRestController.class);
     @PostMapping("/invoices")
     public ResponseEntity<String> saveInvoice(@RequestBody Invoice invoice) {
@@ -146,6 +146,17 @@ public class InvoiceRestController {
         }
         return responseEntity;
     }
+
+
+    /**
+     * To update one invoice Just like where clause condition, updates Invoice Object @ return Status as ResponseEntity<String>
+     */
+    @PatchMapping("/invoices/{id}/{number}")
+    private ResponseEntity<String> updateInvoiceNumberById(@PathVariable Long id , @PathVariable String number){
+        return null;
+    }
+
+
 }
 
 
