@@ -118,14 +118,19 @@ public class InvoiceServiceImpl implements InvoiceService {
 
     @Override
     public Integer updateInvoiceNumberById(String number, Long id) {
-        if(!repo.existsById(id)) {
-            throw new InvoiceNotFoundException(
-                    new StringBuffer()
-                            .append("Invoice '")
-                            .append(id)
-                            .append("' not exist")
-                            .toString());
+        // Check if the invoice exists
+        if (!repo.existsById(id)) {
+            throw new InvoiceNotFoundException("Invoice with id '" + id + "' does not exist.");
         }
-        return repo.updateInvoiceNumberById(number, id);
+
+        // Perform the update and check the result
+        int updatedRows = repo.updateInvoiceNumberById(number, id);
+
+        if (updatedRows == 0) {
+            throw new InvoiceNotFoundException("Failed to update the invoice with id '" + id + "'.");
+        }
+
+        return updatedRows;
     }
+
 }

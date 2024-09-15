@@ -152,8 +152,23 @@ public class InvoiceRestController {
      * To update one invoice Just like where clause condition, updates Invoice Object @ return Status as ResponseEntity<String>
      */
     @PatchMapping("/invoices/{id}/{number}")
-    private ResponseEntity<String> updateInvoiceNumberById(@PathVariable Long id , @PathVariable String number){
-        return null;
+    public ResponseEntity<String> updateInvoiceNumberById(@PathVariable Long id , @PathVariable String number){
+        ResponseEntity<String> responseEntity = null;
+        try {
+            invoiceService.updateInvoiceNumberById(number,id);
+            responseEntity = new ResponseEntity<>("Invoice "+number+" Updated",HttpStatus.PARTIAL_CONTENT);
+            } catch(InvoiceNotFoundException pne) {
+            throw pne; // re-throw exception to handler
+        }
+        catch (Exception exception){
+            logger.error("Unable to save the Invoice");
+            responseEntity= new ResponseEntity<>(
+                    "Unable to Update Invoice",
+                    HttpStatus.INTERNAL_SERVER_ERROR); }
+
+        return responseEntity;
+
+
     }
 
 
