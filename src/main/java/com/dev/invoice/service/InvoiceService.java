@@ -27,7 +27,7 @@ public interface InvoiceService {
      */
     Invoice getOneInvoice(Long id);
 
-    Optional<Invoice> getSingleInvoice(Long id);
+    //Optional<Invoice> getSingleInvoice(Long id);
 
     /**
      * select all rows and provide result as a List<Invoice>

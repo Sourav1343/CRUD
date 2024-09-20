@@ -70,10 +70,7 @@ public class InvoiceServiceImpl implements InvoiceService {
         }
     }
 
-    @Override
-    public Optional<Invoice> getSingleInvoice(Long id) {
-        return repo.findById(id);
-    }
+
 
     @Override
     public Invoice getOneInvoice(Long id) {
