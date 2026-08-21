@@ -1,0 +1,25 @@
+name: Stage Source Branch Check
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches:
+      - stage
+
+jobs:
+  validate-source:
+    name: Stage Source Branch Check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Validate source branch
+        run: |
+          echo "Source branch: ${{ github.head_ref }}"
+          echo "Target branch: ${{ github.base_ref }}"
+
+          if [ "${{ github.head_ref }}" != "development" ]; then
+            echo "ERROR: Only development can merge into stage."
+            exit 1
+          fi
+
+          echo "SUCCESS: development -> stage is allowed."
